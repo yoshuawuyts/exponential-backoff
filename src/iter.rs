@@ -33,13 +33,13 @@ impl<'b> iter::Iterator for Iter<'b> {
     }
 
     // Create exponential duration.
-    self.retry_count += 1;
     let exponent = self.inner.factor.pow(self.retry_count);
     let mut duration = self.inner.min * exponent;
 
+    self.retry_count += 1;
+
     // Apply jitter. Uses multiples of 100 to prevent relying on floats.
     let jitter_factor = (self.inner.jitter * 100f32) as u32;
-    println!("{:?}", jitter_factor);
     let random: u32 = self.rng.gen_range(0, jitter_factor * 2);
     duration *= 100;
     if random < jitter_factor {

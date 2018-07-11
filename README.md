@@ -60,11 +60,11 @@ $ cargo add exponential-backoff
 ## License
 [MIT](./LICENSE-MIT) OR [Apache-2.0](./LICENSE-APACHE)
 
-[1]: https://img.shields.io/crates/v/back.svg?style=flat-square
-[2]: https://crates.io/crates/back
-[3]: https://img.shields.io/travis/yoshuawuyts/back.svg?style=flat-square
-[4]: https://travis-ci.org/yoshuawuyts/back
+[1]: https://img.shields.io/crates/v/exponential-backoff.svg?style=flat-square
+[2]: https://crates.io/crates/exponential-backoff
+[3]: https://img.shields.io/travis/yoshuawuyts/exponential-backoff.svg?style=flat-square
+[4]: https://travis-ci.org/yoshuawuyts/exponential-backoff
 [5]: https://img.shields.io/crates/d/back.svg?style=flat-square
-[6]: https://crates.io/crates/back
-[7]: https://docs.rs/back/badge.svg
-[8]: https://docs.rs/back
+[6]: https://crates.io/crates/exponential-backoff
+[7]: https://docs.rs/exponential-backoff/badge.svg
+[8]: https://docs.rs/exponential-backoff

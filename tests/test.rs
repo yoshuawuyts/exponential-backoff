@@ -11,7 +11,7 @@ fn doesnt_crash() -> std::io::Result<()> {
     .jitter(0.3)
     .factor(2);
 
-  for duration in backoff.iter() {
+  for duration in &backoff {
     println!("duration {:?}", duration);
     match fs::read_to_string("README.md") {
       Ok(_string) => return Ok(()),

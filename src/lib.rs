@@ -5,9 +5,9 @@
 
 extern crate rand;
 
-mod iter;
+mod iterator;
 
-use std::time;
+use std::{iter, time};
 
 /// Exponential backoff struct.
 #[derive(Debug, Clone)]
@@ -68,7 +68,16 @@ impl Backoff {
 
   /// Create an iterator.
   #[inline]
-  pub fn iter(&self) -> iter::Iter {
-    iter::Iter::new(self)
+  pub fn iter(&self) -> iterator::Iter {
+    iterator::Iter::new(self)
+  }
+}
+
+impl<'b> iter::IntoIterator for &'b Backoff {
+  type Item = Option<time::Duration>;
+  type IntoIter = iterator::Iter<'b>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    Self::IntoIter::new(self)
   }
 }

@@ -25,7 +25,7 @@ should be similar.
 extern crate exponential_backoff;
 
 use exponential_backoff::Backoff;
-use std::{fs, thread};
+use std::{fs, thread, time::Duration};
 
 let retries = 8;
 let backoff = Backoff::new(retries)

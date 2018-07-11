@@ -35,10 +35,10 @@ impl Backoff {
   /// Set the min and max durations.
   #[inline]
   pub fn timeout_range(
-    &mut self,
+    mut self,
     min: time::Duration,
     max: time::Duration,
-  ) -> &mut Self {
+  ) -> Self {
     self.min = min;
     self.max = max;
     self
@@ -50,7 +50,7 @@ impl Backoff {
   /// This method panics if a number smaller than `0` or larger than `1` is
   /// provided.
   #[inline]
-  pub fn jitter(&mut self, jitter: f32) -> &mut Self {
+  pub fn jitter(mut self, jitter: f32) -> Self {
     assert!(
       jitter > 0f32 && jitter < 1f32,
       "<exponential-backoff>: jitter must be between 0 and 1."
@@ -61,7 +61,7 @@ impl Backoff {
 
   /// Set the growth factor for each iteration of the backoff.
   #[inline]
-  pub fn factor(&mut self, factor: u32) -> &mut Self {
+  pub fn factor(mut self, factor: u32) -> Self {
     self.factor = factor;
     self
   }

@@ -66,5 +66,5 @@ $ cargo add exponential-backoff
 [4]: https://travis-ci.org/yoshuawuyts/exponential-backoff
 [5]: https://img.shields.io/crates/d/exponential-backoff.svg?style=flat-square
 [6]: https://crates.io/crates/exponential-backoff
-[7]: https://docs.rs/exponential-backoff/badge.svg
+[7]: https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square
 [8]: https://docs.rs/exponential-backoff

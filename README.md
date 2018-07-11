@@ -8,7 +8,18 @@ retry functions.
 - [Documentation][8]
 - [Crates.io][2]
 
+## Why?
+When an network requests times out, often the best way to solve it is to try
+again. But trying again straight away might at best cause some network overhead,
+and at worst a full fledged DDOS. So we have to be responsible about it.
+
+A good explanation of retry strategies can be found on the [Stripe
+blog](https://stripe.com/blog/idempotency).
+
 ## Usage
+Here we try and read a file from disk, and try again if it fails. A more
+realistic scenario would probably to perform an HTTP request, but the approach
+should be similar.
 
 ```rust
 extern crate exponential_backoff;
@@ -18,7 +29,7 @@ use std::{fs, thread};
 
 let retries = 8;
 let backoff = Backoff::new(retries)
-  .range(Duration::from_millis(100), Duration::from_secs(10))
+  .timeout_range(Duration::from_millis(100), Duration::from_secs(10))
   .jitter(0.3)
   .factor(2);
 
@@ -38,8 +49,13 @@ for duration in &backoff {
 $ cargo add exponential-backoff
 ```
 
-## Further Reading
+## See Also
 - [segment/backo](https://github.com/segmentio/backo)
+- [stripe/stripe-ruby](https://github.com/stripe/stripe-ruby/blob/1bb9ac48b916b1c60591795cdb7ba6d18495e82d/lib/stripe/stripe_client.rb#L78-L92)
+
+## Further Reading
+- https://stripe.com/blog/idempotency
+- https://en.wikipedia.org/wiki/Exponential_backoff
 
 ## License
 [MIT](./LICENSE-MIT) OR [Apache-2.0](./LICENSE-APACHE)

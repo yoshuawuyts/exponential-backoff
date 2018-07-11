@@ -9,5 +9,6 @@ authors = ["Yoshua Wuyts <yoshuawuyts@gmail.com>"]
 readme = "README.md"
 
 [dependencies]
+rand = "0.5.3"
 
 [dev-dependencies]

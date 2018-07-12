@@ -7,9 +7,10 @@ extern crate rand;
 
 mod iterator;
 
+pub use iterator::Iter;
 use std::{iter, time};
 
-/// Exponential backoff struct.
+/// Exponential backoff.
 #[derive(Debug, Clone)]
 pub struct Backoff {
   retries: u32,
@@ -75,7 +76,7 @@ impl Backoff {
 
 impl<'b> iter::IntoIterator for &'b Backoff {
   type Item = Option<time::Duration>;
-  type IntoIter = iterator::Iter<'b>;
+  type IntoIter = Iter<'b>;
 
   fn into_iter(self) -> Self::IntoIter {
     Self::IntoIter::new(self)

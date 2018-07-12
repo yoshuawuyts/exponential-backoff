@@ -2,7 +2,7 @@ use super::Backoff;
 use rand::{rngs::ThreadRng, thread_rng, Rng};
 use std::{iter, time};
 
-/// Iterator
+/// Immutable iterator.
 #[derive(Debug, Clone)]
 pub struct Iter<'b> {
   inner: &'b Backoff,

@@ -20,3 +20,17 @@ fn doesnt_crash() -> std::io::Result<()> {
 
     unreachable!();
 }
+
+#[test]
+fn iterator_completes() {
+  let retries = 3;
+  let backoff = Backoff::new(retries);
+  let mut counter = 0;
+  for duration in &backoff {
+    counter += 1;
+    if let Some(duration) = duration {
+      thread::sleep(duration);
+    }
+  }
+  assert_eq!(counter, 1 + retries);
+}

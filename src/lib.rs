@@ -7,7 +7,7 @@ extern crate rand;
 
 mod iterator;
 
-pub use iterator::Iter;
+pub use crate::iterator::Iter;
 use std::{iter, time};
 
 /// Exponential backoff.

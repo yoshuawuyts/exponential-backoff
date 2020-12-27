@@ -5,22 +5,18 @@ use std::{fs, thread, time::Duration};
 
 #[test]
 fn doesnt_crash() -> std::io::Result<()> {
-  let retries = 8;
-  let backoff = Backoff::new(retries)
-    .timeout_range(Duration::from_millis(100), Duration::from_secs(10))
-    .jitter(0.3)
-    .factor(2);
+    let retries = 8;
+    let min = Duration::from_millis(100);
+    let max = Duration::from_secs(10);
+    let backoff = Backoff::new(retries, min, max);
 
-  for duration in &backoff {
-    println!("duration {:?}", duration);
-    match fs::read_to_string("README.md") {
-      Ok(_string) => return Ok(()),
-      Err(err) => match duration {
-        Some(duration) => thread::sleep(duration),
-        None => return Err(err),
-      },
+    for duration in &backoff {
+        println!("duration {:?}", duration);
+        match fs::read_to_string("README.md") {
+            Ok(_string) => return Ok(()),
+            Err(_) => thread::sleep(duration),
+        }
     }
-  }
 
-  unreachable!();
+    unreachable!();
 }

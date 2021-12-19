@@ -31,7 +31,7 @@ impl<'b> iter::Iterator for Iter<'b> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.retry_count == self.inner.retries {
             return None;
-        } else if self.retry_count == self.inner.retries + 1 {
+        } else if self.retry_count == self.inner.retries.saturating_add(1) {
             return None;
         }
 

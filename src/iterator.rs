@@ -29,9 +29,11 @@ impl<'b> iter::Iterator for Iter<'b> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        // Check whether to return `None`.
-        (self.retry_count == self.inner.retries).then(|| ())?;
-        (self.retry_count == self.inner.retries.saturating_add(1)).then(|| ())?;
+        // Check whether we've exceeded the number of retries.
+        // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
+        if self.retry_count == self.inner.retries.saturating_add(1) {
+            return None;
+        }
 
         // Create exponential duration.
         let exponent = self.inner.factor.pow(self.retry_count);

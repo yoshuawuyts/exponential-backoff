@@ -1,12 +1,12 @@
 use super::Backoff;
-use rand::{rngs::ThreadRng, thread_rng, Rng};
+use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::{iter, time};
 
 /// An exponential backoff iterator.
 #[derive(Debug, Clone)]
 pub struct Iter<'b> {
     inner: &'b Backoff,
-    rng: ThreadRng,
+    rng: StdRng,
     retry_count: u32,
 }
 
@@ -19,7 +19,7 @@ impl<'b> Iter<'b> {
         Self {
             inner,
             retry_count,
-            rng: thread_rng(),
+            rng: StdRng::from_entropy(),
         }
     }
 }

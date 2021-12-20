@@ -56,7 +56,8 @@ pub struct Backoff {
 impl Backoff {
     /// Create a new instance.
     ///
-    /// ## Panics
+    /// # Panics
+    ///
     /// This method panics if the retry count is set to 0.
     #[inline]
     pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {

@@ -43,7 +43,7 @@ impl<'b> iter::Iterator for Iter<'b> {
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         let jitter_factor = (self.inner.jitter * 100f32) as u32;
-        let random: u32 = self.rng.gen_range(0, jitter_factor * 2);
+        let random: u32 = self.rng.gen_range(0..jitter_factor * 2);
         duration *= 100;
         if random < jitter_factor {
             let jitter = (duration * random) / 100;

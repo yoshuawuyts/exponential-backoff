@@ -36,29 +36,30 @@ impl<'b> iter::Iterator for Iter<'b> {
         }
 
         // Create exponential duration.
-        let exponent = self.inner.factor.pow(self.retry_count);
-        let mut duration = self.inner.min * exponent;
+        let exponent = self.inner.factor.saturating_pow(self.retry_count);
+        let duration = self.inner.min.saturating_mul(exponent);
 
         self.retry_count += 1;
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         let jitter_factor = (self.inner.jitter * 100f32) as u32;
         let random: u32 = self.rng.gen_range(0..jitter_factor * 2);
-        duration *= 100;
+        let duration = duration.saturating_mul(100);
         if random < jitter_factor {
-            let jitter = (duration * random) / 100;
-            duration -= jitter;
+            let jitter = duration.saturating_mul(random) / 100;
+            let duration = duration.saturating_sub(jitter);
         } else {
-            let jitter = (duration * (random / 2)) / 100;
-            duration += jitter;
+            let jitter = duration.saturating_mul(random / 2) / 100;
+            let duration = duration.saturating_add(jitter);
         };
-        duration /= 100;
+        let duration = duration / 100;
 
         // Make sure it doesn't exceed upper / lower bounds.
         if let Some(max) = self.inner.max {
-            duration = duration.min(max);
+            let duration = duration.min(max);
         }
-        duration = duration.max(self.inner.min);
+
+        let duration = duration.max(self.inner.min);
 
         Some(duration)
     }

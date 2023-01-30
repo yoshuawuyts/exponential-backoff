@@ -34,3 +34,19 @@ fn iterator_completes() {
     }
     assert_eq!(counter, 1 + retries);
 }
+
+#[test]
+fn max_backoff_without_crashing() {
+    let retries = u32::MAX;
+    let min = Duration::MAX;
+    let backoff = Backoff::new(retries, min, None);
+
+    let mut counter = 0u32;
+    for _ in &backoff {
+        counter += 1;
+        if counter > 32 {
+            break;
+        }
+    }
+}
+

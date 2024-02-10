@@ -1,12 +1,12 @@
 use super::Backoff;
-use rand::{rngs::StdRng, Rng, SeedableRng};
+use fastrand::Rng;
 use std::{iter, time};
 
 /// An exponential backoff iterator.
 #[derive(Debug, Clone)]
 pub struct Iter<'b> {
     inner: &'b Backoff,
-    rng: StdRng,
+    rng: Rng,
     retry_count: u32,
 }
 
@@ -19,7 +19,7 @@ impl<'b> Iter<'b> {
         Self {
             inner,
             retry_count,
-            rng: StdRng::from_entropy(),
+            rng: Rng::new(),
         }
     }
 }
@@ -43,7 +43,7 @@ impl<'b> iter::Iterator for Iter<'b> {
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         let jitter_factor = (self.inner.jitter * 100f32) as u32;
-        let random: u32 = self.rng.gen_range(0..jitter_factor * 2);
+        let random = self.rng.u32(0..jitter_factor * 2);
         let mut duration = duration.saturating_mul(100);
         if random < jitter_factor {
             let jitter = duration.saturating_mul(random) / 100;

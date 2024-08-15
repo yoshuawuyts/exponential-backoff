@@ -49,4 +49,3 @@ fn max_backoff_without_crashing() {
         }
     }
 }
-

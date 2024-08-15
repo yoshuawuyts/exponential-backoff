@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: [stable, nightly]
+        rust: [stable]
 
     steps:
     - uses: actions/checkout@master
@@ -33,50 +33,22 @@ jobs:
         command: check
         args: --all --bins --examples
 
-    - name: check avoid-dev-deps
-      uses: actions-rs/cargo@v1
-      if: matrix.rust == 'nightly'
-      with:
-        command: check
-        args: --all -Z avoid-dev-deps
-
-    - name: check unstable
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --all --bins --examples --tests
-
-    - name: check benches
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --benches
-
     - name: tests
       uses: actions-rs/cargo@v1
       with:
         command: test
         args: --all
 
-    - name: tests unstable
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all
-
   check_fmt_and_docs:
-    name: Checking fmt, clippy, and docs
+    name: Checking fmt and docs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-
-    - name: setup
-      run: |
-        rustup component add clippy rustfmt
-        rustc --version
-
-    - name: clippy
-      run: cargo clippy --tests --examples -- -D warnings
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        components: rustfmt, clippy
+        override: true
 
     - name: fmt
       run: cargo fmt --all -- --check

@@ -1,6 +1,6 @@
 [package]
 name = "exponential-backoff"
-version = "1.2.0"
+version = "1.2.1"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/yoshuawuyts/exponential-backoff"
 documentation = "https://docs.rs/exponential-backoff"

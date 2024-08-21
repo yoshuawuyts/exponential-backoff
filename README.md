@@ -2,8 +2,8 @@
 [![crates.io version][1]][2]
 [![downloads][5]][6] [![docs.rs docs][7]][8]
 
-Exponential backoff generator. Serves as a building block to implement custom
-retry functions.
+An exponential backoff generator with jitter. Serves as a building block to
+implement custom retry functions.
 
 - [Documentation][8]
 - [Crates.io][2]

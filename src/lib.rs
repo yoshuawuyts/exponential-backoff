@@ -1,5 +1,5 @@
-//! Exponential backoff generator. Serves as a building block to implement custom
-//! retry functions.
+//! An exponential backoff generator with jitter. Serves as a building block to
+//! implement custom retry functions.
 //!
 //! # Why?
 //! When an network requests times out, often the best way to solve it is to try

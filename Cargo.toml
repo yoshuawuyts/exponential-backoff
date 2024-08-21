@@ -4,10 +4,12 @@ version = "1.2.0"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/yoshuawuyts/exponential-backoff"
 documentation = "https://docs.rs/exponential-backoff"
-description = "A small and flexible backoff function"
+description = "An exponential backoff generator with jitter."
+keywords = ["backoff", "retry", "simple", "exponential", "async"]
+categories = ["algorithms", "date-and-time", ]
 authors = ["Yoshua Wuyts <yoshuawuyts@gmail.com>"]
 readme = "README.md"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 fastrand = "2"

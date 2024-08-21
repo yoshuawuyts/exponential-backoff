@@ -15,13 +15,9 @@ pub struct Iter<'b> {
 
 impl<'b> Iter<'b> {
     pub(crate) fn new(inner: &'b Backoff) -> Self {
-        Self::with_count(inner, 0)
-    }
-
-    pub(crate) fn with_count(inner: &'b Backoff, retry_count: u32) -> Self {
         Self {
             inner,
-            retry_count,
+            retry_count: 0,
             rng: Rng::new(),
             is_complete: false,
         }
@@ -33,14 +29,14 @@ impl<'b> iter::Iterator for Iter<'b> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
+        self.retry_count += 1;
+
         // If we're on the last iteration we don't return a `Duration`: you
         // shouldn't sleep after the last attempt fails. Once the last item has
         // yielded, we mark the iterator as done.
         if self.is_complete {
-            dbg!();
             return None;
         } else if self.retry_count == self.inner.retries {
-            dbg!();
             self.is_complete = true;
             return Some(None);
         }
@@ -48,8 +44,6 @@ impl<'b> iter::Iterator for Iter<'b> {
         // Create exponential duration.
         let exponent = self.inner.factor.saturating_pow(self.retry_count);
         let duration = self.inner.min.saturating_mul(exponent);
-
-        self.retry_count += 1;
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         let jitter_factor = (self.inner.jitter * 100f32) as u32;

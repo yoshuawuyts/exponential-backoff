@@ -25,21 +25,28 @@ impl<'b> Iter<'b> {
 }
 
 impl<'b> iter::Iterator for Iter<'b> {
-    type Item = time::Duration;
+    type Item = Option<time::Duration>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
+        let retries = self.inner.retries.saturating_add(1);
         // Check whether we've exceeded the number of retries.
         // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.retry_count == self.inner.retries.saturating_add(1) {
+        if self.retry_count == retries {
             return None;
+        }
+
+        self.retry_count = self.retry_count.saturating_add(1);
+
+        // This is the last time we should retry, but we don't want to sleep
+        // after this iteration.
+        if self.retry_count == retries {
+            return Some(None);
         }
 
         // Create exponential duration.
         let exponent = self.inner.factor.saturating_pow(self.retry_count);
         let duration = self.inner.min.saturating_mul(exponent);
-
-        self.retry_count += 1;
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         let jitter_factor = (self.inner.jitter * 100f32) as u32;
@@ -61,6 +68,6 @@ impl<'b> iter::Iterator for Iter<'b> {
 
         duration = duration.max(self.inner.min);
 
-        Some(duration)
+        Some(Some(duration))
     }
 }

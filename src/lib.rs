@@ -67,11 +67,6 @@ impl Backoff {
     /// This method panics if the retry count is set to 0.
     #[inline]
     pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
-        assert!(
-            retries >= 1,
-            "<exponential-backoff>: retries should be 1 or higher."
-        );
-
         Self {
             retries,
             min,

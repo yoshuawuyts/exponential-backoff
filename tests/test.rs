@@ -77,3 +77,13 @@ fn max_backoff_without_crashing() {
         }
     }
 }
+
+#[test]
+fn no_retry() {
+    let mut count = 0;
+    for duration in &Backoff::new(0, Duration::from_millis(10), None) {
+        assert!(duration.is_none());
+        count += 1;
+    }
+    assert_eq!(count, 1);
+}

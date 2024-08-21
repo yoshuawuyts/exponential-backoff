@@ -22,9 +22,8 @@
 //! let retries = 8;
 //! let min = Duration::from_millis(100);
 //! let max = Duration::from_secs(10);
-//! let backoff = Backoff::new(retries, min, max);
 //!
-//! for duration in &backoff {
+//! for duration in Backoff::new(retries, min, max) {
 //!     match fs::read_to_string("README.md") {
 //!         Ok(s) => {
 //!             println!("{}", s);
@@ -42,12 +41,13 @@
 //! # Ok(()) }
 //! ```
 
-use std::iter;
 use std::time::Duration;
 
-pub use iterator::Iter;
+pub use into_iter::IntoIter;
+pub use iter::Iter;
 
-mod iterator;
+mod into_iter;
+mod iter;
 
 /// Exponential backoff type.
 #[derive(Debug, Clone)]
@@ -125,9 +125,18 @@ impl Backoff {
     }
 }
 
-impl<'b> iter::IntoIterator for &'b Backoff {
+impl<'b> IntoIterator for &'b Backoff {
     type Item = Option<Duration>;
     type IntoIter = Iter<'b>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Self::IntoIter::new(self)
+    }
+}
+
+impl IntoIterator for Backoff {
+    type Item = Option<Duration>;
+    type IntoIter = IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter::new(self)

@@ -28,9 +28,8 @@ use std::{fs, thread, time::Duration};
 let retries = 8;
 let min = Duration::from_millis(100);
 let max = Duration::from_secs(10);
-let backoff = Backoff::new(retries, min, max);
 
-for duration in &backoff {
+for duration in Backoff::new(retries, min, max) {
     match fs::read_to_string("README.md") {
         Ok(string) => return Ok(string),
         Err(err) => match duration {

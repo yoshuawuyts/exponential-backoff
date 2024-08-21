@@ -104,11 +104,6 @@ impl Backoff {
         self.factor = factor;
     }
 
-    /// Get the next value for the retry count.
-    pub fn next(&self, retry_attempt: u32) -> Option<Duration> {
-        Iter::with_count(self, retry_attempt).next().flatten()
-    }
-
     /// Create an iterator.
     #[inline]
     pub fn iter(&self) -> Iter {

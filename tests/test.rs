@@ -40,8 +40,8 @@ fn iter_completes() {
             slept += 1;
         }
     }
-    assert_eq!(slept, retries);
-    assert_eq!(counter, 1 + retries);
+    assert_eq!(slept, retries - 1);
+    assert_eq!(counter, retries);
 }
 
 #[test]
@@ -59,8 +59,8 @@ fn into_iter_completes() {
             slept += 1;
         }
     }
-    assert_eq!(slept, retries);
-    assert_eq!(counter, 1 + retries);
+    assert_eq!(slept, retries - 1);
+    assert_eq!(counter, retries);
 }
 
 #[test]

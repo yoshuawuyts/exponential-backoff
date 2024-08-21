@@ -12,14 +12,10 @@ pub struct Iter<'b> {
 
 impl<'b> Iter<'b> {
     pub(crate) fn new(inner: &'b Backoff) -> Self {
-        Self::with_count(inner, 0)
-    }
-
-    pub(crate) fn with_count(inner: &'b Backoff, retry_count: u32) -> Self {
         Self {
-            inner,
-            retry_count,
+            retry_count: inner.retries,
             rng: Rng::new(),
+            inner,
         }
     }
 }
@@ -29,19 +25,18 @@ impl<'b> iter::Iterator for Iter<'b> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let retries = self.inner.retries.saturating_add(1);
-        // Check whether we've exceeded the number of retries.
-        // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.retry_count == retries {
+        // Check whether we're done iterating.
+        if self.retry_count == 0 {
             return None;
         }
 
-        self.retry_count = self.retry_count.saturating_add(1);
-
         // This is the last time we should retry, but we don't want to sleep
         // after this iteration.
-        if self.retry_count == retries {
+        if self.retry_count == 1 {
+            self.retry_count -= 1;
             return Some(None);
+        } else {
+            self.retry_count -= 1;
         }
 
         // Create exponential duration.

@@ -30,7 +30,9 @@
 //!             println!("{}", s);
 //!             break;
 //!         }
-//!         Err(err) => thread::sleep(duration),
+//!         Err(err) => if let Some(duration) = duration {
+//!             thread::sleep(duration);
+//!         }
 //!     }
 //! }
 //! # Ok(()) }
@@ -109,7 +111,7 @@ impl Backoff {
 
     /// Get the next value for the retry count.
     pub fn next(&self, retry_attempt: u32) -> Option<Duration> {
-        Iter::with_count(self, retry_attempt).next()
+        Iter::with_count(self, retry_attempt).next().flatten()
     }
 
     /// Create an iterator.
@@ -120,7 +122,7 @@ impl Backoff {
 }
 
 impl<'b> iter::IntoIterator for &'b Backoff {
-    type Item = Duration;
+    type Item = Option<Duration>;
     type IntoIter = Iter<'b>;
 
     fn into_iter(self) -> Self::IntoIter {

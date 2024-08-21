@@ -14,7 +14,11 @@ fn doesnt_crash() -> std::io::Result<()> {
         println!("duration {:?}", duration);
         match fs::read_to_string("README.md") {
             Ok(_string) => return Ok(()),
-            Err(_) => thread::sleep(duration),
+            Err(_) => {
+                if let Some(duration) = duration {
+                    thread::sleep(duration);
+                }
+            }
         }
     }
 
@@ -30,7 +34,9 @@ fn iterator_completes() {
     let mut counter = 0;
     for duration in &backoff {
         counter += 1;
-        thread::sleep(duration);
+        if let Some(duration) = duration {
+            thread::sleep(duration);
+        }
     }
     assert_eq!(counter, 1 + retries);
 }

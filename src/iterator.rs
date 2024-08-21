@@ -1,6 +1,8 @@
 use super::Backoff;
+
 use fastrand::Rng;
-use std::{iter, time};
+use std::iter;
+use std::time::Duration;
 
 /// An exponential backoff iterator.
 #[derive(Debug, Clone)]
@@ -8,6 +10,7 @@ pub struct Iter<'b> {
     inner: &'b Backoff,
     rng: Rng,
     retry_count: u32,
+    is_complete: bool,
 }
 
 impl<'b> Iter<'b> {
@@ -20,19 +23,26 @@ impl<'b> Iter<'b> {
             inner,
             retry_count,
             rng: Rng::new(),
+            is_complete: false,
         }
     }
 }
 
 impl<'b> iter::Iterator for Iter<'b> {
-    type Item = time::Duration;
+    type Item = Option<Duration>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        // Check whether we've exceeded the number of retries.
-        // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.retry_count == self.inner.retries.saturating_add(1) {
+        // If we're on the last iteration we don't return a `Duration`: you
+        // shouldn't sleep after the last attempt fails. Once the last item has
+        // yielded, we mark the iterator as done.
+        if self.is_complete {
+            dbg!();
             return None;
+        } else if self.retry_count == self.inner.retries {
+            dbg!();
+            self.is_complete = true;
+            return Some(None);
         }
 
         // Create exponential duration.
@@ -61,6 +71,6 @@ impl<'b> iter::Iterator for Iter<'b> {
 
         duration = duration.max(self.inner.min);
 
-        Some(duration)
+        Some(Some(duration))
     }
 }

@@ -14,10 +14,10 @@ fn doesnt_crash() -> std::io::Result<()> {
         println!("duration {:?}", duration);
         match fs::read_to_string("README.md") {
             Ok(_string) => return Ok(()),
-            Err(_) => if let Some(duration) = duration {
-                thread::sleep(duration);
-            } else {
-                eprintln!("failed to read file after {retries}");
+            Err(_) => {
+                if let Some(duration) = duration {
+                    thread::sleep(duration);
+                }
             }
         }
     }
@@ -38,8 +38,6 @@ fn iterator_completes() {
         if let Some(duration) = duration {
             thread::sleep(duration);
             slept += 1;
-        } else {
-            break;
         }
     }
     assert_eq!(slept, retries);

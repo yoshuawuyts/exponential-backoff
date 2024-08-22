@@ -54,7 +54,7 @@ mod iter;
 pub struct Backoff {
     retries: u32,
     min: Duration,
-    max: Option<Duration>,
+    max: Duration,
     jitter: f32,
     factor: u32,
 }
@@ -66,7 +66,7 @@ impl Backoff {
         Self {
             retries,
             min,
-            max: max.into(),
+            max: max.into().unwrap_or(Duration::MAX),
             jitter: 0.3,
             factor: 2,
         }
@@ -80,7 +80,7 @@ impl Backoff {
 
     /// Set the max duration.
     #[inline]
-    pub fn set_max(&mut self, max: Option<Duration>) {
+    pub fn set_max(&mut self, max: Duration) {
         self.max = max;
     }
 

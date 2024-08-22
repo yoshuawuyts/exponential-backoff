@@ -1,6 +1,6 @@
 use super::Backoff;
 use fastrand::Rng;
-use std::{iter, time};
+use std::{iter, time::Duration};
 
 /// An exponential backoff iterator.
 #[derive(Debug, Clone)]
@@ -25,7 +25,7 @@ impl IntoIter {
 }
 
 impl iter::Iterator for IntoIter {
-    type Item = Option<time::Duration>;
+    type Item = Option<Duration>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -62,11 +62,7 @@ impl iter::Iterator for IntoIter {
         duration /= 100;
 
         // Make sure it doesn't exceed upper / lower bounds.
-        if let Some(max) = self.inner.max {
-            duration = duration.min(max);
-        }
-
-        duration = duration.max(self.inner.min);
+        duration = duration.clamp(self.inner.min, self.inner.max);
 
         Some(Some(duration))
     }

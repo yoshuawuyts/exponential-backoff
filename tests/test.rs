@@ -5,10 +5,10 @@ use std::{fs, thread, time::Duration};
 
 #[test]
 fn doesnt_crash() -> std::io::Result<()> {
-    let retries = 8;
+    let attempts = 8;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
+    let backoff = Backoff::new(attempts, min, max);
 
     for duration in &backoff {
         println!("duration {:?}", duration);
@@ -27,10 +27,10 @@ fn doesnt_crash() -> std::io::Result<()> {
 
 #[test]
 fn iter_completes() {
-    let retries = 3;
+    let attempts = 3;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
+    let backoff = Backoff::new(attempts, min, max);
     let mut counter = 0;
     let mut slept = 0;
     for duration in &backoff {
@@ -40,16 +40,16 @@ fn iter_completes() {
             slept += 1;
         }
     }
-    assert_eq!(slept, retries - 1);
-    assert_eq!(counter, retries);
+    assert_eq!(slept, attempts - 1);
+    assert_eq!(counter, attempts);
 }
 
 #[test]
 fn into_iter_completes() {
-    let retries = 3;
+    let attempts = 3;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
+    let backoff = Backoff::new(attempts, min, max);
     let mut counter = 0;
     let mut slept = 0;
     for duration in backoff {
@@ -59,15 +59,15 @@ fn into_iter_completes() {
             slept += 1;
         }
     }
-    assert_eq!(slept, retries - 1);
-    assert_eq!(counter, retries);
+    assert_eq!(slept, attempts - 1);
+    assert_eq!(counter, attempts);
 }
 
 #[test]
 fn max_backoff_without_crashing() {
-    let retries = u32::MAX;
+    let attempts = u32::MAX;
     let min = Duration::MAX;
-    let backoff = Backoff::new(retries, min, None);
+    let backoff = Backoff::new(attempts, min, None);
 
     let mut counter = 0u32;
     for _ in &backoff {

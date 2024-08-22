@@ -13,7 +13,7 @@ pub struct IntoIter {
 impl IntoIter {
     pub(crate) fn new(inner: Backoff) -> Self {
         Self {
-            attempt_count: inner.retries,
+            attempt_count: inner.attempts,
             rng: Rng::new(),
             inner,
         }

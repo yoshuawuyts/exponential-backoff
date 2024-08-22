@@ -19,11 +19,11 @@
 //! use exponential_backoff::Backoff;
 //! use std::{fs, thread, time::Duration};
 //!
-//! let retries = 8;
+//! let attempts = 3;
 //! let min = Duration::from_millis(100);
 //! let max = Duration::from_secs(10);
 //!
-//! for duration in Backoff::new(retries, min, max) {
+//! for duration in Backoff::new(attempts, min, max) {
 //!     match fs::read_to_string("README.md") {
 //!         Ok(s) => {
 //!             println!("{}", s);
@@ -52,7 +52,7 @@ mod iter;
 /// Exponential backoff type.
 #[derive(Debug, Clone)]
 pub struct Backoff {
-    retries: u32,
+    attempts: u32,
     min: Duration,
     max: Option<Duration>,
     jitter: f32,
@@ -64,7 +64,7 @@ impl Backoff {
     #[inline]
     pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
         Self {
-            retries,
+            attempts: retries,
             min,
             max: max.into(),
             jitter: 0.3,

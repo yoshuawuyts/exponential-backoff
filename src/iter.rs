@@ -25,10 +25,10 @@ impl<'b> iter::Iterator for Iter<'b> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let retries = self.inner.retries.saturating_add(1);
-        // Check whether we've exceeded the number of retries.
+        let max_attempts = self.inner.attempts.saturating_add(1);
+        // Check whether we've exceeded the number of attempts.
         // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.attempt_count == retries {
+        if self.attempt_count == max_attempts {
             return None;
         }
 
@@ -36,7 +36,7 @@ impl<'b> iter::Iterator for Iter<'b> {
 
         // This is the last time we should retry, but we don't want to sleep
         // after this iteration.
-        if self.attempt_count == retries {
+        if self.attempt_count == max_attempts {
             return Some(None);
         }
 

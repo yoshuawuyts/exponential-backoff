@@ -29,12 +29,9 @@
 //!             println!("{}", s);
 //!             break;
 //!         }
-//!         Err(err) => {
-//!             if let Some(duration) = duration {
-//!                 thread::sleep(duration);
-//!             } else {
-//!                 return Err(err);        
-//!             }
+//!         Err(err) => match duration {
+//!             Some(duration) => thread::sleep(duration),
+//!             None => return Err(err),
 //!         }
 //!     }
 //! }
@@ -62,9 +59,9 @@ pub struct Backoff {
 impl Backoff {
     /// Create a new instance.
     #[inline]
-    pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
+    pub fn new(max_attempts: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
         Self {
-            max_attempts: retries,
+            max_attempts,
             min,
             max: max.into(),
             jitter: 0.3,

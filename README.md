@@ -34,7 +34,7 @@ for duration in Backoff::new(attempts, min, max) {
         Ok(string) => return Ok(string),
         Err(err) => match duration {
             Some(duration) => thread::sleep(duration),
-            None => return err,
+            None => return Err(err),
         }
     }
 }

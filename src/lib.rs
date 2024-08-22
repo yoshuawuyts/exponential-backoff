@@ -52,7 +52,7 @@ mod iter;
 /// Exponential backoff type.
 #[derive(Debug, Clone)]
 pub struct Backoff {
-    attempts: u32,
+    max_attempts: u32,
     min: Duration,
     max: Option<Duration>,
     jitter: f32,
@@ -64,7 +64,7 @@ impl Backoff {
     #[inline]
     pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
         Self {
-            attempts: retries,
+            max_attempts: retries,
             min,
             max: max.into(),
             jitter: 0.3,

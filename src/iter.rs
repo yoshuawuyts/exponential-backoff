@@ -7,14 +7,14 @@ use std::{iter, time};
 pub struct Iter<'b> {
     inner: &'b Backoff,
     rng: Rng,
-    attempt_count: u32,
+    attempts: u32,
 }
 
 impl<'b> Iter<'b> {
     pub(crate) fn new(inner: &'b Backoff) -> Self {
         Self {
             inner,
-            attempt_count: 0,
+            attempts: 0,
             rng: Rng::new(),
         }
     }
@@ -25,23 +25,23 @@ impl<'b> iter::Iterator for Iter<'b> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let max_attempts = self.inner.attempts.saturating_add(1);
+        let max_attempts = self.inner.max_attempts.saturating_add(1);
         // Check whether we've exceeded the number of attempts.
         // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.attempt_count == max_attempts {
+        if self.attempts == max_attempts {
             return None;
         }
 
-        self.attempt_count = self.attempt_count.saturating_add(1);
+        self.attempts = self.attempts.saturating_add(1);
 
         // This is the last time we should retry, but we don't want to sleep
         // after this iteration.
-        if self.attempt_count == max_attempts {
+        if self.attempts == max_attempts {
             return Some(None);
         }
 
         // Create exponential duration.
-        let exponent = self.inner.factor.saturating_pow(self.attempt_count);
+        let exponent = self.inner.factor.saturating_pow(self.attempts);
         let duration = self.inner.min.saturating_mul(exponent);
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.

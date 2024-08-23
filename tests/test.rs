@@ -5,12 +5,11 @@ use std::{fs, thread, time::Duration};
 
 #[test]
 fn doesnt_crash() -> std::io::Result<()> {
-    let retries = 8;
+    let attempts = 8;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
 
-    for duration in &backoff {
+    for duration in &Backoff::new(attempts, min, max) {
         println!("duration {:?}", duration);
         match fs::read_to_string("README.md") {
             Ok(_string) => return Ok(()),
@@ -27,50 +26,49 @@ fn doesnt_crash() -> std::io::Result<()> {
 
 #[test]
 fn iter_completes() {
-    let retries = 3;
+    let attempts = 3;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
+
     let mut counter = 0;
     let mut slept = 0;
-    for duration in &backoff {
+
+    for duration in &Backoff::new(attempts, min, max) {
         counter += 1;
         if let Some(duration) = duration {
             thread::sleep(duration);
             slept += 1;
         }
     }
-    assert_eq!(slept, retries);
-    assert_eq!(counter, 1 + retries);
+    assert_eq!(slept, attempts - 1);
+    assert_eq!(counter, attempts);
 }
 
 #[test]
 fn into_iter_completes() {
-    let retries = 3;
+    let attempts = 3;
+
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
-    let backoff = Backoff::new(retries, min, max);
     let mut counter = 0;
     let mut slept = 0;
-    for duration in backoff {
+    for duration in Backoff::new(attempts, min, max) {
         counter += 1;
         if let Some(duration) = duration {
             thread::sleep(duration);
             slept += 1;
         }
     }
-    assert_eq!(slept, retries);
-    assert_eq!(counter, 1 + retries);
+    assert_eq!(slept, attempts - 1);
+    assert_eq!(counter, attempts);
 }
 
 #[test]
 fn max_backoff_without_crashing() {
-    let retries = u32::MAX;
+    let attempts = u32::MAX;
     let min = Duration::MAX;
-    let backoff = Backoff::new(retries, min, None);
-
     let mut counter = 0u32;
-    for _ in &backoff {
+    for _ in &Backoff::new(attempts, min, None) {
         counter += 1;
         if counter > 32 {
             break;
@@ -79,11 +77,12 @@ fn max_backoff_without_crashing() {
 }
 
 #[test]
-fn no_retry() {
+fn no_attempts() {
     let mut count = 0;
-    for duration in &Backoff::new(0, Duration::from_millis(10), None) {
+    let attempts = 0;
+    for duration in &Backoff::new(attempts, Duration::from_millis(10), None) {
         assert!(duration.is_none());
         count += 1;
     }
-    assert_eq!(count, 1);
+    assert_eq!(count, 0);
 }

@@ -19,22 +19,19 @@
 //! use exponential_backoff::Backoff;
 //! use std::{fs, thread, time::Duration};
 //!
-//! let retries = 8;
+//! let attempts = 3;
 //! let min = Duration::from_millis(100);
 //! let max = Duration::from_secs(10);
 //!
-//! for duration in Backoff::new(retries, min, max) {
+//! for duration in Backoff::new(attempts, min, max) {
 //!     match fs::read_to_string("README.md") {
 //!         Ok(s) => {
 //!             println!("{}", s);
 //!             break;
 //!         }
-//!         Err(err) => {
-//!             if let Some(duration) = duration {
-//!                 thread::sleep(duration);
-//!             } else {
-//!                 return Err(err);        
-//!             }
+//!         Err(err) => match duration {
+//!             Some(duration) => thread::sleep(duration),
+//!             None => return Err(err),
 //!         }
 //!     }
 //! }
@@ -50,7 +47,7 @@ pub use crate::into_iter::IntoIter;
 /// Exponential backoff type.
 #[derive(Debug, Clone)]
 pub struct Backoff {
-    retries: u32,
+    max_attempts: u32,
     min: Duration,
     max: Duration,
     jitter: f32,
@@ -60,9 +57,9 @@ pub struct Backoff {
 impl Backoff {
     /// Create a new instance.
     #[inline]
-    pub fn new(retries: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
+    pub fn new(max_attempts: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
         Self {
-            retries,
+            max_attempts,
             min,
             max: max.into().unwrap_or(Duration::MAX),
             jitter: 0.3,
@@ -100,13 +97,6 @@ impl Backoff {
     #[inline]
     pub fn set_factor(&mut self, factor: u32) {
         self.factor = factor;
-    }
-
-    /// Get the next value for the retry count.
-    pub fn next(&self, retry_attempt: u32) -> Option<Duration> {
-        IntoIter::with_count(self.clone(), retry_attempt)
-            .next()
-            .flatten()
     }
 
     /// Create an iterator.

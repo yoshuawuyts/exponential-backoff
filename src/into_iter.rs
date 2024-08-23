@@ -7,19 +7,15 @@ use std::{iter, time::Duration};
 pub struct IntoIter {
     inner: Backoff,
     rng: Rng,
-    retry_count: u32,
+    attempts: u32,
 }
 
 impl IntoIter {
     pub(crate) fn new(inner: Backoff) -> Self {
-        Self::with_count(inner, 0)
-    }
-
-    pub(crate) fn with_count(inner: Backoff, retry_count: u32) -> Self {
         Self {
-            inner,
-            retry_count,
+            attempts: 0,
             rng: Rng::new(),
+            inner,
         }
     }
 }
@@ -29,23 +25,20 @@ impl iter::Iterator for IntoIter {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let retries = self.inner.retries.saturating_add(1);
-        // Check whether we've exceeded the number of retries.
-        // We use `saturating_add` to prevent overflowing on `int::MAX + 1`.
-        if self.retry_count == retries {
+        // Check whether we've exceeded the number of attempts,
+        // or whether we're on our last attempt. We don't want to sleep after
+        // the last attempt.
+        if self.attempts == self.inner.max_attempts {
             return None;
-        }
-
-        self.retry_count = self.retry_count.saturating_add(1);
-
-        // This is the last time we should retry, but we don't want to sleep
-        // after this iteration.
-        if self.retry_count == retries {
+        } else if self.attempts == self.inner.max_attempts - 1 {
+            self.attempts = self.attempts.saturating_add(1);
             return Some(None);
         }
 
+        self.attempts = self.attempts.saturating_add(1);
+
         // Create exponential duration.
-        let exponent = self.inner.factor.saturating_pow(self.retry_count);
+        let exponent = self.inner.factor.saturating_pow(self.attempts);
         let duration = self.inner.min.saturating_mul(exponent);
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.

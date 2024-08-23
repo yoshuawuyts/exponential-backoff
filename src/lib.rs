@@ -38,13 +38,11 @@
 //! # Ok(()) }
 //! ```
 
+mod into_iter;
+
 use std::time::Duration;
 
-pub use into_iter::IntoIter;
-pub use iter::Iter;
-
-mod into_iter;
-mod iter;
+pub use crate::into_iter::IntoIter;
 
 /// Exponential backoff type.
 #[derive(Debug, Clone)]
@@ -103,17 +101,17 @@ impl Backoff {
 
     /// Create an iterator.
     #[inline]
-    pub fn iter(&self) -> Iter {
-        Iter::new(self)
+    pub fn iter(&self) -> IntoIter {
+        IntoIter::new(self.clone())
     }
 }
 
 impl<'b> IntoIterator for &'b Backoff {
     type Item = Option<Duration>;
-    type IntoIter = Iter<'b>;
+    type IntoIter = IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
+        Self::IntoIter::new(self.clone())
     }
 }
 

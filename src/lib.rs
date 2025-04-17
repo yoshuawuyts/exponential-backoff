@@ -53,19 +53,6 @@ pub struct Backoff {
     jitter: f32,
     factor: u32,
 }
-
-impl std::default::Default for Backoff {
-    fn default() -> Self {
-        Self {
-            max_attempts: 3,
-            min: Duration::from_millis(100),
-            max: Duration::from_secs(10),
-            jitter: 0.3,
-            factor: 2,
-        }
-    }
-}
-
 impl Backoff {
     /// Create a new instance.
     #[inline]
@@ -79,16 +66,78 @@ impl Backoff {
         }
     }
 
+    /// Get the min duration
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.min(), &Duration::from_millis(100));
+    /// ```
+    pub fn min(&self) -> &Duration {
+        &self.min
+    }
+
     /// Set the min duration.
     #[inline]
     pub fn set_min(&mut self, min: Duration) {
         self.min = min;
     }
 
+    /// Get the max duration
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.max(), &Duration::from_secs(10));
+    /// ```
+    pub fn max(&self) -> &Duration {
+        &self.max
+    }
+
     /// Set the max duration.
     #[inline]
     pub fn set_max(&mut self, max: Duration) {
         self.max = max;
+    }
+
+    /// Get the maximum number of attempts
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.max_attempts(), 3);
+    /// ```
+    pub fn max_attempts(&self) -> u32 {
+        self.max_attempts
+    }
+
+    pub fn set_max_attempts(&mut self, max_attempts: u32) {
+        self.max_attempts = max_attempts;
+    }
+
+    /// Get the jitter factor
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.jitter(), 0.3);
+    /// ```
+    pub fn jitter(&self) -> f32 {
+        self.jitter
     }
 
     /// Set the amount of jitter per backoff.
@@ -115,6 +164,20 @@ impl Backoff {
             "<exponential-backoff>: jitter must be between 0 and 1."
         );
         self.jitter = jitter;
+    }
+
+    /// Get the growth factor
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.factor(), 2);
+    /// ```
+    pub fn factor(&self) -> u32 {
+        self.factor
     }
 
     /// Set the growth factor for each iteration of the backoff.
@@ -145,5 +208,17 @@ impl IntoIterator for Backoff {
 
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter::new(self)
+    }
+}
+
+impl Default for Backoff {
+    fn default() -> Self {
+        Self {
+            max_attempts: 3,
+            min: Duration::from_millis(100),
+            max: Duration::from_secs(10),
+            jitter: 0.3,
+            factor: 2,
+        }
     }
 }

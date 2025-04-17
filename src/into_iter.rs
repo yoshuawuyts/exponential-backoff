@@ -35,11 +35,12 @@ impl iter::Iterator for IntoIter {
             return Some(None);
         }
 
-        self.attempts = self.attempts.saturating_add(1);
-
         // Create exponential duration.
         let exponent = self.inner.factor.saturating_pow(self.attempts);
         let mut duration = self.inner.min.saturating_mul(exponent);
+
+        // Increment the attempts counter.
+        self.attempts = self.attempts.saturating_add(1);
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
         //

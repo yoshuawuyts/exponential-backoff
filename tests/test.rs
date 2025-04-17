@@ -123,3 +123,19 @@ fn it_has_the_right_min_value() {
         "Third interval should be min value * factor^2"
     );
 }
+
+/// Tests that we uphold the invariant of ever-increasing sleep values.
+#[test]
+fn it_generates_ascending_sleep_values() {
+    let mut backoff = Backoff::new(20, Duration::from_secs(1), None);
+    backoff.set_factor(2);
+    backoff.set_jitter(0.0); // No jitter to make test deterministic
+
+    let mut max = Duration::from_millis(0);
+    for duration in backoff {
+        if let Some(duration) = duration {
+            assert!(duration >= max);
+            max = duration;
+        }
+    }
+}

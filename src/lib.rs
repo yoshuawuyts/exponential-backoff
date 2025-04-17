@@ -87,6 +87,17 @@ impl Backoff {
         self.min = min;
     }
 
+    /// Get the max duration
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.max(), &Duration::from_secs(10));
+    /// ```
     pub fn max(&self) -> &Duration {
         &self.max
     }
@@ -97,6 +108,16 @@ impl Backoff {
         self.max = max;
     }
 
+    /// Get the maximum number of attempts
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.max_attempts(), 3);
+    /// ```
     pub fn max_attempts(&self) -> u32 {
         self.max_attempts
     }
@@ -105,6 +126,16 @@ impl Backoff {
         self.max_attempts = max_attempts;
     }
 
+    /// Get the jitter factor
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.jitter(), 0.3);
+    /// ```
     pub fn jitter(&self) -> f32 {
         self.jitter
     }
@@ -135,6 +166,16 @@ impl Backoff {
         self.jitter = jitter;
     }
 
+    /// Get the growth factor
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// assert_eq!(backoff.factor(), 2);
+    /// ```
     pub fn factor(&self) -> u32 {
         self.factor
     }

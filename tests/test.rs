@@ -86,3 +86,42 @@ fn it_handles_zero_attempts() {
     }
     assert_eq!(count, 0);
 }
+
+#[test]
+fn it_handles_no_jitter() {
+    let mut backoff = Backoff::default();
+    backoff.set_jitter(0.0);
+
+    // Exercise the iterator a number of times
+    let mut durations = backoff.into_iter();
+    durations.next();
+    durations.next();
+    durations.next();
+}
+
+#[test]
+fn first_interval_should_be_min_value() {
+    // Set up a backoff with predictable values
+    let mut backoff = Backoff::new(4, Duration::from_secs(1), None);
+    backoff.set_factor(2);
+    backoff.set_jitter(0.0); // No jitter to make test deterministic
+
+    let mut durations = backoff.into_iter().take(3);
+
+    assert_eq!(
+        durations.next(),
+        Some(Some(Duration::from_secs(1))),
+        "First interval should equal the min value, not double it"
+    );
+    assert_eq!(
+        durations.next(),
+        Some(Some(Duration::from_secs(2))),
+        "Second interval should be min value * factor"
+    );
+    assert_eq!(
+        durations.next(),
+        Some(Some(Duration::from_secs(4))),
+        "Third interval should be min value * factor^2"
+    );
+    // assert_eq!(durations.next(), None, "Last interval is empty");
+}

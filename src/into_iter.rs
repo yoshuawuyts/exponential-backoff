@@ -39,20 +39,26 @@ impl iter::Iterator for IntoIter {
 
         // Create exponential duration.
         let exponent = self.inner.factor.saturating_pow(self.attempts);
-        let duration = self.inner.min.saturating_mul(exponent);
+        let mut duration = self.inner.min.saturating_mul(exponent);
 
         // Apply jitter. Uses multiples of 100 to prevent relying on floats.
-        let jitter_factor = (self.inner.jitter * 100f32) as u32;
-        let random = self.rng.u32(0..jitter_factor * 2);
-        let mut duration = duration.saturating_mul(100);
-        if random < jitter_factor {
-            let jitter = duration.saturating_mul(random) / 100;
-            duration = duration.saturating_sub(jitter);
-        } else {
-            let jitter = duration.saturating_mul(random / 2) / 100;
-            duration = duration.saturating_add(jitter);
-        };
-        duration /= 100;
+        //
+        // We put this in a conditional block because the `fastrand` crate
+        // doesn't like `0..0` inputs, and dividing by zero is also not a good
+        // idea.
+        if self.inner.jitter != 0.0 {
+            let jitter_factor = (self.inner.jitter * 100f32) as u32;
+            let random = self.rng.u32(0..jitter_factor * 2);
+            let mut duration = duration.saturating_mul(100);
+            if random < jitter_factor {
+                let jitter = duration.saturating_mul(random) / 100;
+                duration = duration.saturating_sub(jitter);
+            } else {
+                let jitter = duration.saturating_mul(random / 2) / 100;
+                duration = duration.saturating_add(jitter);
+            };
+            duration /= 100;
+        }
 
         // Make sure it doesn't exceed upper / lower bounds.
         duration = duration.clamp(self.inner.min, self.inner.max);

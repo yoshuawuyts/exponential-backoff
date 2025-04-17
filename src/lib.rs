@@ -54,7 +54,33 @@ pub struct Backoff {
     factor: u32,
 }
 impl Backoff {
-    /// Create a new instance.
+    /// Create a new instance of `Backoff`.
+    ///
+    /// # Examples
+    ///
+    /// With an explicit max duration:
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let backoff = Backoff::new(3, Duration::from_millis(100), Duration::from_secs(10));
+    /// assert_eq!(backoff.max_attempts(), 3);
+    /// assert_eq!(backoff.min(), &Duration::from_millis(100));
+    /// assert_eq!(backoff.max(), &Duration::from_secs(10));
+    /// ```
+    ///
+    /// With no max duration (sets it to 584,942,417,355 years):
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let backoff = Backoff::new(5, Duration::from_millis(50), None);
+    /// # assert_eq!(backoff.max_attempts(), 5);
+    /// # assert_eq!(backoff.min(), &Duration::from_millis(50));
+    /// assert_eq!(backoff.max(), &Duration::MAX);
+    /// ```
     #[inline]
     pub fn new(max_attempts: u32, min: Duration, max: impl Into<Option<Duration>>) -> Self {
         Self {
@@ -236,6 +262,24 @@ impl Backoff {
     }
 }
 
+/// Implements the `IntoIterator` trait for borrowed `Backoff` instances.
+///
+/// # Examples
+///
+/// ```rust
+/// use exponential_backoff::Backoff;
+/// use std::time::Duration;
+///
+/// let backoff = Backoff::default();
+/// let mut count = 0;
+///
+/// for duration in &backoff {
+///     count += 1;
+///     if count > 1 {
+///         break;
+///     }
+/// }
+/// ```
 impl<'b> IntoIterator for &'b Backoff {
     type Item = Option<Duration>;
     type IntoIter = IntoIter;
@@ -245,6 +289,24 @@ impl<'b> IntoIterator for &'b Backoff {
     }
 }
 
+/// Implements the `IntoIterator` trait for owned `Backoff` instances.
+///
+/// # Examples
+///
+/// ```rust
+/// use exponential_backoff::Backoff;
+/// use std::time::Duration;
+///
+/// let backoff = Backoff::default();
+/// let mut count = 0;
+///
+/// for duration in backoff {
+///     count += 1;
+///     if count > 1 {
+///         break;
+///     }
+/// }
+/// ```
 impl IntoIterator for Backoff {
     type Item = Option<Duration>;
     type IntoIter = IntoIter;
@@ -254,6 +316,21 @@ impl IntoIterator for Backoff {
     }
 }
 
+/// Implements the `Default` trait for `Backoff`.
+///
+/// # Examples
+///
+/// ```rust
+/// use exponential_backoff::Backoff;
+/// use std::time::Duration;
+///
+/// let backoff = Backoff::default();
+/// assert_eq!(backoff.max_attempts(), 3);
+/// assert_eq!(backoff.min(), &Duration::from_millis(100));
+/// assert_eq!(backoff.max(), &Duration::from_secs(10));
+/// assert_eq!(backoff.jitter(), 0.3);
+/// assert_eq!(backoff.factor(), 2);
+/// ```
 impl Default for Backoff {
     fn default() -> Self {
         Self {

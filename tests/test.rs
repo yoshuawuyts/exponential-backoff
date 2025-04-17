@@ -25,7 +25,7 @@ fn it_doesnt_crash() -> std::io::Result<()> {
 }
 
 #[test]
-fn it_completes_iter() {
+fn it_correctly_handles_max_attempts() {
     let attempts = 3;
     let min = Duration::from_millis(10);
     let max = Duration::from_millis(20);
@@ -100,14 +100,13 @@ fn it_handles_no_jitter() {
 }
 
 #[test]
-fn first_interval_should_be_min_value() {
+fn it_has_the_right_min_value() {
     // Set up a backoff with predictable values
     let mut backoff = Backoff::new(4, Duration::from_secs(1), None);
     backoff.set_factor(2);
     backoff.set_jitter(0.0); // No jitter to make test deterministic
 
-    let mut durations = backoff.into_iter().take(3);
-
+    let mut durations = backoff.into_iter();
     assert_eq!(
         durations.next(),
         Some(Some(Duration::from_secs(1))),
@@ -123,5 +122,20 @@ fn first_interval_should_be_min_value() {
         Some(Some(Duration::from_secs(4))),
         "Third interval should be min value * factor^2"
     );
-    assert_eq!(durations.next(), None, "Last interval is empty");
+}
+
+/// Tests that we uphold the invariant of ever-increasing sleep values.
+#[test]
+fn it_generates_ascending_sleep_values() {
+    let mut backoff = Backoff::new(20, Duration::from_secs(1), None);
+    backoff.set_factor(2);
+    backoff.set_jitter(0.0); // No jitter to make test deterministic
+
+    let mut max = Duration::from_millis(0);
+    for duration in backoff {
+        if let Some(duration) = duration {
+            assert!(duration >= max);
+            max = duration;
+        }
+    }
 }

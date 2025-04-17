@@ -93,13 +93,25 @@ impl Backoff {
 
     /// Set the amount of jitter per backoff.
     ///
-    /// ## Panics
+    /// # Panics
+    ///
     /// This method panics if a number smaller than `0` or larger than `1` is
     /// provided.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// backoff.set_jitter(0.3);  // default value
+    /// backoff.set_jitter(0.0);  // min value
+    /// backoff.set_jitter(1.0);  // max value
+    /// ```
     #[inline]
     pub fn set_jitter(&mut self, jitter: f32) {
         assert!(
-            jitter > 0f32 && jitter < 1f32,
+            jitter >= 0f32 && jitter <= 1f32,
             "<exponential-backoff>: jitter must be between 0 and 1."
         );
         self.jitter = jitter;

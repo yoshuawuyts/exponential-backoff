@@ -82,6 +82,17 @@ impl Backoff {
     }
 
     /// Set the min duration.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// backoff.set_min(Duration::from_millis(50));
+    /// assert_eq!(backoff.min(), &Duration::from_millis(50));
+    /// ```
     #[inline]
     pub fn set_min(&mut self, min: Duration) {
         self.min = min;
@@ -103,6 +114,17 @@ impl Backoff {
     }
 
     /// Set the max duration.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    /// use std::time::Duration;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// backoff.set_max(Duration::from_secs(30));
+    /// assert_eq!(backoff.max(), &Duration::from_secs(30));
+    /// ```
     #[inline]
     pub fn set_max(&mut self, max: Duration) {
         self.max = max;
@@ -122,6 +144,17 @@ impl Backoff {
         self.max_attempts
     }
 
+    /// Set the maximum number of attempts.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// backoff.set_max_attempts(5);
+    /// assert_eq!(backoff.max_attempts(), 5);
+    /// ```
     pub fn set_max_attempts(&mut self, max_attempts: u32) {
         self.max_attempts = max_attempts;
     }
@@ -181,6 +214,16 @@ impl Backoff {
     }
 
     /// Set the growth factor for each iteration of the backoff.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use exponential_backoff::Backoff;
+    ///
+    /// let mut backoff = Backoff::default();
+    /// backoff.set_factor(3);
+    /// assert_eq!(backoff.factor(), 3);
+    /// ```
     #[inline]
     pub fn set_factor(&mut self, factor: u32) {
         self.factor = factor;

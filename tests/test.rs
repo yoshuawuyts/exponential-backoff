@@ -123,5 +123,5 @@ fn first_interval_should_be_min_value() {
         Some(Some(Duration::from_secs(4))),
         "Third interval should be min value * factor^2"
     );
-    // assert_eq!(durations.next(), None, "Last interval is empty");
+    assert_eq!(durations.next(), None, "Last interval is empty");
 }

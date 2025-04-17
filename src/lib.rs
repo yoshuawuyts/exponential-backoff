@@ -54,6 +54,18 @@ pub struct Backoff {
     factor: u32,
 }
 
+impl std::default::Default for Backoff {
+    fn default() -> Self {
+        Self {
+            max_attempts: 3,
+            min: Duration::from_millis(100),
+            max: Duration::from_secs(10),
+            jitter: 0.3,
+            factor: 2,
+        }
+    }
+}
+
 impl Backoff {
     /// Create a new instance.
     #[inline]

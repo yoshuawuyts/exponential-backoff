@@ -10,6 +10,10 @@
 //! blog](https://stripe.com/blog/idempotency).
 //!
 //! # Usage
+//!
+//! Create a new `Backoff` and use it as an iterator. The iterator yields `Option<Duration>`
+//! values, yielding `None` on the final attempt.
+//!
 //! Here we try and read a file from disk, and try again if it fails. A more
 //! realistic scenario would probably to perform an HTTP request, but the approach
 //! should be similar.

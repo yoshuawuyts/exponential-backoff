@@ -1,7 +1,7 @@
 extern crate exponential_backoff;
 
 use exponential_backoff::Backoff;
-use std::{fs, thread, time::Duration};
+use std::{cmp::Ordering, fs, thread, time::Duration};
 
 #[test]
 fn it_doesnt_crash() -> std::io::Result<()> {
@@ -85,6 +85,14 @@ fn it_handles_zero_attempts() {
         count += 1;
     }
     assert_eq!(count, 0);
+}
+
+#[test]
+fn it_applies_jitter_by_default() {
+    let backoff1 = Backoff::default();
+    let backoff2 = Backoff::default();
+
+    assert_ne!(backoff1.into_iter().cmp(backoff2.into_iter()), Ordering::Equal);
 }
 
 #[test]

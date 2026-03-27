@@ -92,7 +92,10 @@ fn it_applies_jitter_by_default() {
     let backoff1 = Backoff::default();
     let backoff2 = Backoff::default();
 
-    assert_ne!(backoff1.into_iter().cmp(backoff2.into_iter()), Ordering::Equal);
+    assert_ne!(
+        backoff1.into_iter().cmp(backoff2.into_iter()),
+        Ordering::Equal
+    );
 }
 
 #[test]

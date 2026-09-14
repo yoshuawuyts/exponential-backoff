@@ -50,7 +50,7 @@ impl iter::Iterator for IntoIter {
         if self.inner.jitter != 0.0 {
             let jitter_factor = (self.inner.jitter * 100f32) as u32;
             let random = self.rng.u32(0..jitter_factor * 2);
-            let mut duration = duration.saturating_mul(100);
+            duration = duration.saturating_mul(100);
             if random < jitter_factor {
                 let jitter = duration.saturating_mul(random) / 100;
                 duration = duration.saturating_sub(jitter);
